@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "http://localhost:5000/",
   "dependencies": {
+    "@reach/combobox": "^0.16.3",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^13.1.9",
@@ -20,8 +21,8 @@
   },
   "devDependencies": {
     "eslint": "^7.30.0",
-    "prettier": "^2.3.2",
-    "husky": "7.0.2"
+    "husky": "7.0.2",
+    "prettier": "^2.3.2"
   },
   "scripts": {
     "start": "react-scripts start",
