@@ -98,6 +98,17 @@ const OrderForm = (props) => {
               );
             })}
         </select>
+        <Combobox aria-labelledby="demo">
+          <ComboboxInput />
+          <ComboboxPopover>
+            <ComboboxList>
+              {STATES &&
+                STATES.map((state, index) => {
+                  return <ComboboxOption value={state.name} />;
+                })}
+            </ComboboxList>
+          </ComboboxPopover>
+        </Combobox>
       </div>
 
       <div className="form-group">
