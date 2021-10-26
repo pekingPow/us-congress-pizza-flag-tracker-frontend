@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { STATES } from "./states.js";
 import { STATUSES } from "./Statuses.js";
 import { baseURL } from "../http-common";
@@ -25,10 +25,12 @@ const OrderForm = (props) => {
     deleteOrderFunc,
   } = props;
 
+  const [validationMessage, setValidationMessage] = useState("");
+
   const onKeyDownEvent = (event) => {
     if (event.key === "Enter") {
       event.currentTarget.blur();
-      handleInputChange(event);
+      validateEvent(event);
     }
   };
 
@@ -41,7 +43,26 @@ const OrderForm = (props) => {
     };
     clickEvent.target.value = event.target.innerText;
     clickEvent.target.name = event.target.className;
-    handleInputChange(clickEvent);
+    validateEvent(clickEvent);
+  };
+
+  const validateEvent = (event) => {
+    const isValid = STATES.map((state) => state.name).includes(
+      event.target.value.toUpperCase()
+    );
+    if (isValid) {
+      setValidationMessage("");
+      handleInputChange(event);
+    } else {
+      setValidationMessage("Not a valid State");
+    }
+  };
+
+  // prevent browser autocomplete form overlapping ComboBox
+  const removeReadOnly = (event) => {
+    const doc = document.getElementById("comboUSAState");
+    doc.removeAttribute("readOnly");
+    console.log(doc);
   };
 
   const handleInputChange = (event) => {
@@ -75,7 +96,11 @@ const OrderForm = (props) => {
   // putting this in Component State makes this check old state instead of what state is being updated to
   // and/or exceed maximum update depth error
   let districtMatchCheck = true;
-  if (mode === "edit" && order.usa_state) {
+  if (
+    mode === "edit" &&
+    order.usa_state &&
+    STATES.map((state) => state.name).includes(order.usa_state)
+  ) {
     let currentDistricts = STATES.filter(
       (state) => state.name === order.usa_state
     );
@@ -123,8 +148,13 @@ const OrderForm = (props) => {
         </select>
         <Combobox aria-labelledby="usa_state">
           <ComboboxInput
+            id="comboUSAState"
+            maxLength="2"
+            minLength="2"
             name="usa_state"
+            onFocus={removeReadOnly} // prevent browser autocomplete form overlapping ComboBox
             onKeyDown={onKeyDownEvent}
+            readOnly="readOnly" // prevent browser autocomplete form overlapping ComboBox
             selectOnClick
           />
           <ComboboxPopover>
@@ -144,6 +174,8 @@ const OrderForm = (props) => {
         </Combobox>
       </div>
 
+      <p>&nbsp;</p>
+
       <div className="form-group">
         <label htmlFor="home_office_code">Congressional Office:</label>{" "}
         <select
@@ -157,17 +189,19 @@ const OrderForm = (props) => {
             Select
           </option>
 
-          {STATES &&
-            order.usa_state &&
-            STATES.filter((state) => state.name === order.usa_state)[0][
-              "districts"
-            ].map((district, index) => {
-              return (
-                <option value={district} key={index}>
-                  {district}
-                </option>
-              );
-            })}
+          {STATES.map((state) => state.name).includes(order.usa_state)
+            ? STATES &&
+              order.usa_state &&
+              STATES.filter((state) => state.name === order.usa_state)[0][
+                "districts"
+              ].map((district, index) => {
+                return (
+                  <option value={district} key={index}>
+                    {district}
+                  </option>
+                );
+              })
+            : ""}
         </select>
       </div>
 
@@ -221,7 +255,8 @@ const OrderForm = (props) => {
           !order.order_number ||
           !order.usa_state ||
           !order.home_office_code ||
-          !districtMatchCheck
+          !districtMatchCheck ||
+          !(validationMessage === "")
         }
         onClick={saveOrderFunc}
         className="btn btn-success"
@@ -235,6 +270,8 @@ const OrderForm = (props) => {
         ) : (
           <p>&nbsp;</p>
         )}
+        {validationMessage}
+        {validationMessage ? <p>&nbsp;</p> : ""}
       </div>
     </div>
   );
