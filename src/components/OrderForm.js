@@ -8,7 +8,7 @@ import {
   ComboboxPopover,
   ComboboxList,
   ComboboxOption,
-  ComboboxOptionText,
+  // ComboboxOptionText,
 } from "@reach/combobox";
 import "@reach/combobox/styles.css";
 import "./OrderForm.css";
@@ -27,6 +27,7 @@ const OrderForm = (props) => {
 
   const [validationMessage, setValidationMessage] = useState("");
 
+  // if user types data and presses 'Enter' instead of clicking on ComboBox suggestion; see handleClick
   const onKeyDownEvent = (event) => {
     if (event.key === "Enter") {
       event.currentTarget.blur();
@@ -34,6 +35,7 @@ const OrderForm = (props) => {
     }
   };
 
+  // if user clicks on ComboBox suggestion but doesn't think to press 'Enter'; see onKeyDownEvent
   const handleClick = (event) => {
     let clickEvent = {
       target: {
@@ -46,6 +48,7 @@ const OrderForm = (props) => {
     validateEvent(clickEvent);
   };
 
+  // check if user input matches valid data (i.e. an existing US State)
   const validateEvent = (event) => {
     const isValid = STATES.map((state) => state.name).includes(
       event.target.value.toUpperCase()
@@ -152,9 +155,9 @@ const OrderForm = (props) => {
             maxLength="2"
             minLength="2"
             name="usa_state"
-            onFocus={removeReadOnly} // prevent browser autocomplete form overlapping ComboBox
+            onFocus={removeReadOnly} // prevent browser autofill from overlapping ComboBox
             onKeyDown={onKeyDownEvent}
-            readOnly="readOnly" // prevent browser autocomplete form overlapping ComboBox
+            readOnly="readOnly" // prevent browser autofill from overlapping ComboBox
             selectOnClick
           />
           <ComboboxPopover>
