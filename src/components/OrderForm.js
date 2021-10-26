@@ -11,6 +11,7 @@ import {
   ComboboxOptionText,
 } from "@reach/combobox";
 import "@reach/combobox/styles.css";
+import "./OrderForm.css";
 
 const OrderForm = (props) => {
   const {
@@ -24,9 +25,31 @@ const OrderForm = (props) => {
     deleteOrderFunc,
   } = props;
 
+  const onKeyDownEvent = (event) => {
+    if (event.key === "Enter") {
+      event.currentTarget.blur();
+      handleInputChange(event);
+    }
+  };
+
+  const handleClick = (event) => {
+    let clickEvent = {
+      target: {
+        name: "",
+        value: "",
+      },
+    };
+    clickEvent.target.value = event.target.innerText;
+    clickEvent.target.name = event.target.className;
+    handleInputChange(clickEvent);
+  };
+
   const handleInputChange = (event) => {
-    const { name, value } = event.target;
+    let { name, value } = event.target;
+    console.log(name);
+    console.log(value);
     if (name === "usa_state") {
+      value = value.toUpperCase();
       setOrderFunc({ ...order, home_office_code: "" });
     }
     setOrderFunc((prevOrderFunc) => {
@@ -78,8 +101,8 @@ const OrderForm = (props) => {
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="usa_state">US State:</label>{" "}
+      <div className="form-group, flex">
+        <label htmlFor="usa_state">US State: {order.usa_state}</label>{" "}
         <select
           value={order.usa_state ? order.usa_state : "select"}
           id="usa_state"
@@ -98,13 +121,23 @@ const OrderForm = (props) => {
               );
             })}
         </select>
-        <Combobox aria-labelledby="demo">
-          <ComboboxInput />
+        <Combobox aria-labelledby="usa_state">
+          <ComboboxInput
+            name="usa_state"
+            onKeyDown={onKeyDownEvent}
+            selectOnClick
+          />
           <ComboboxPopover>
-            <ComboboxList>
+            <ComboboxList onClick={handleClick}>
               {STATES &&
                 STATES.map((state, index) => {
-                  return <ComboboxOption value={state.name} />;
+                  return (
+                    <ComboboxOption
+                      value={state.name}
+                      className="usa_state"
+                      key={index}
+                    />
+                  );
                 })}
             </ComboboxList>
           </ComboboxPopover>
@@ -123,6 +156,7 @@ const OrderForm = (props) => {
           <option value="select" key="blank" hidden disabled>
             Select
           </option>
+
           {STATES &&
             order.usa_state &&
             STATES.filter((state) => state.name === order.usa_state)[0][
